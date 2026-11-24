@@ -1,6 +1,10 @@
 @echo off
-:: このスクリプトは restore.ps1 を管理者権限で実行するためのラッパー
+setlocal
+rem Launch restore.ps1 with Administrator privileges and pause before closing.
 
-set scriptPath=%~dp0restore.ps1
+set "scriptPath=%~dp0restore.ps1"
+set "extraArgs=%*"
 
-powershell -Command "Start-Process PowerShell -ArgumentList '-ExecutionPolicy Bypass -File \"%scriptPath%\"' -Verb RunAs"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$q = [char]34; $argList = '-NoProfile -ExecutionPolicy Bypass -File ' + $q + $env:scriptPath + $q; if ($env:extraArgs -notmatch '(?i)(?:^|\s)-Pause(?:\s|$)') { $argList += ' -Pause' }; if (-not [string]::IsNullOrWhiteSpace($env:extraArgs)) { $argList += ' ' + $env:extraArgs }; Start-Process -FilePath 'powershell.exe' -ArgumentList $argList -Verb RunAs"
+
+endlocal
